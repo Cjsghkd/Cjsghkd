@@ -1,5 +1,4 @@
 /**
- * GitHub API를 사용하여 외부 레포에 merged된 PR 목록을 가져옴
  *
  * @source https://github.com/dbwls99706/oss-contribution-card
  */
@@ -7,6 +6,11 @@
 import https from 'https';
 
 const REQUEST_TIMEOUT = 30000; // 30초
+
+// ===============================
+// Repo 정보 캐시 (API 중복 호출 방지)
+// ===============================
+const repoInfoCache = new Map();
 
 function httpsGet(url, headers, retries = 3) {
   return new Promise((resolve, reject) => {
@@ -23,7 +27,6 @@ function httpsGet(url, headers, retries = 3) {
         let data = '';
         res.on('data', chunk => data += chunk);
         res.on('end', () => {
-          // 성공
           if (res.statusCode >= 200 && res.statusCode < 300) {
             try {
               resolve(JSON.parse(data));
@@ -50,7 +53,7 @@ function httpsGet(url, headers, retries = 3) {
             return;
           }
 
-          // 서버 오류 시 재시도
+          // 서버 오류 재시도
           if (res.statusCode >= 500 && attempt < retries) {
             const delay = Math.pow(2, attempt) * 1000;
             setTimeout(() => makeRequest(attempt + 1), delay);
@@ -62,7 +65,6 @@ function httpsGet(url, headers, retries = 3) {
       });
 
       req.on('error', (err) => {
-        // 네트워크 오류 시 재시도
         if (attempt < retries && (err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT' || err.code === 'EAI_AGAIN')) {
           const delay = Math.pow(2, attempt) * 1000;
           setTimeout(() => makeRequest(attempt + 1), delay);
@@ -86,8 +88,22 @@ function httpsGet(url, headers, retries = 3) {
   });
 }
 
+// ===============================
+// repo 정보 조회 (owner.type 확인용)
+// ===============================
+async function fetchRepoInfo(repoFullName, headers) {
+  if (repoInfoCache.has(repoFullName)) {
+    return repoInfoCache.get(repoFullName);
+  }
+
+  const url = `https://api.github.com/repos/${repoFullName}`;
+  const repoData = await httpsGet(url, headers);
+
+  repoInfoCache.set(repoFullName, repoData);
+  return repoData;
+}
+
 export async function fetchContributions(username, token = null) {
-  // 입력 검증
   if (!username || typeof username !== 'string') {
     throw new Error('Username is required and must be a string');
   }
@@ -105,7 +121,7 @@ export async function fetchContributions(username, token = null) {
     headers['Authorization'] = `token ${token}`;
   }
 
-  // 자신의 레포를 제외한 merged PR만 검색
+  // 자신의 레포를 제외한 merged PR 검색
   const query = encodeURIComponent(`author:${sanitizedUsername} type:pr is:merged -user:${sanitizedUsername}`);
   const url = `https://api.github.com/search/issues?q=${query}&per_page=100&sort=updated`;
 
@@ -116,27 +132,33 @@ export async function fetchContributions(username, token = null) {
     throw new Error(`Failed to fetch contributions: ${err.message}`);
   }
 
-  // 응답 데이터 검증
   if (!data || typeof data !== 'object') {
     throw new Error('Invalid response from GitHub API');
   }
 
-  // 레포별로 그룹화
   const repoMap = new Map();
   const items = Array.isArray(data.items) ? data.items : [];
 
   for (const item of items) {
-    // 필수 필드 검증
-    if (!item || !item.repository_url) {
-      continue;
-    }
+    if (!item || !item.repository_url) continue;
 
-    // repository_url에서 owner/repo 추출
     const repoFullName = item.repository_url.replace('https://api.github.com/repos/', '');
+    if (!repoFullName || repoFullName === item.repository_url) continue;
 
-    if (!repoFullName || repoFullName === item.repository_url) {
-      continue; // 잘못된 URL 형식 스킵
+    // =========================================
+    // 🔥 A안 적용: Organization repo 제외
+    // =========================================
+    let repoInfo;
+    try {
+      repoInfo = await fetchRepoInfo(repoFullName, headers);
+    } catch (e) {
+      continue; // repo 정보 못 가져오면 스킵
     }
+
+    if (repoInfo?.owner?.type === 'Organization') {
+      continue; // 조직 repo 제거
+    }
+    // =========================================
 
     if (!repoMap.has(repoFullName)) {
       repoMap.set(repoFullName, {
@@ -156,13 +178,11 @@ export async function fetchContributions(username, token = null) {
       mergedAt: mergedAt
     });
 
-    // 가장 최근 merge 날짜 업데이트
     if (mergedAt && (!repo.latestMerge || new Date(mergedAt) > new Date(repo.latestMerge))) {
       repo.latestMerge = mergedAt;
     }
   }
 
-  // 배열로 변환하고 PR 수 기준 정렬
   const contributions = Array.from(repoMap.values())
     .sort((a, b) => b.prs.length - a.prs.length);
 
