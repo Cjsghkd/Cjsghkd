@@ -7,12 +7,6 @@
   <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&amp;weight=500&amp;size=17&amp;duration=2500&amp;pause=1000&amp;color=315DA8&amp;vCenter=true&amp;repeat=false&amp;width=460&amp;height=32&amp;lines=Building+better+Android+experiences." alt="Building better Android experiences." width="460" height="32">
 </picture>
 
-## Experience
-
-- 라이브 방송 Android 앱 개발 및 XML → Jetpack Compose 전환
-- 크래시 개선을 통한 앱 안정성 향상
-- AI 개발 작업 흐름 구성 및 Gitea 협업 환경 구축
-
 ## Tech Stack
 
 <picture>
