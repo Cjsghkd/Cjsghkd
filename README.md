@@ -24,6 +24,6 @@
 
 | 프로젝트 | 병합된 기여 |
 | --- | --- |
-| [DroidKaigi 2026](https://github.com/DroidKaigi/conference-app-2026) | 연속 탭으로 발생하는 중복 뒤로 가기 처리 개선 · [#164](https://github.com/DroidKaigi/conference-app-2026/pull/164) |
+| [DroidKaigi 2026](https://github.com/DroidKaigi/conference-app-2026) | 연속 탭으로 발생하는 중복 뒤로 가기 처리 개선 · [#164](https://github.com/DroidKaigi/conference-app-2026/pull/164)<br>앱 실행별 손그림 UI 변화를 위한 전역 스케치 시드 도입 · [#156](https://github.com/DroidKaigi/conference-app-2026/pull/156) |
 | [DroidKaigi 2024](https://github.com/DroidKaigi/conference-app-2024) | 프로필 카드 화면 UI 구현 · [#379](https://github.com/DroidKaigi/conference-app-2024/pull/379) |
 | [DroidKnights](https://github.com/droidknights/DroidKnightsApp) | placeholder 이미지 리소스를 core-ui 모듈로 이동 · [#237](https://github.com/droidknights/DroidKnightsApp/pull/237) |
