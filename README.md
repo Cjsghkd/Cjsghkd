@@ -7,8 +7,6 @@
   <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&amp;weight=500&amp;size=17&amp;duration=2500&amp;pause=1000&amp;color=315DA8&amp;vCenter=true&amp;repeat=false&amp;width=460&amp;height=32&amp;lines=Building+better+Android+experiences." alt="Building better Android experiences." width="460" height="32">
 </picture>
 
-라이브 방송 앱부터 사이드 프로젝트, 오픈소스까지 Android 앱을 만들고 개선합니다.
-
 ## Experience
 
 - 라이브 방송 Android 앱 개발 및 XML → Jetpack Compose 전환
@@ -27,15 +25,6 @@
 | Android | Kotlin · Jetpack Compose · Coroutines · Hilt |
 | Data & Network | Retrofit · OkHttp · DataStore · Firebase |
 | Build & Collaboration | Gradle · Git · Gitea |
-
-## Side Project
-
-### [MemorySeal · Android](https://github.com/IdiotFrogs/MemorySeal-Android)
-
-Kotlin과 Jetpack Compose 기반의 Android 사이드 프로젝트입니다.
-
-- 추억 메시지 사진 상세 기능 및 공용 사진 뷰어 구현 — [PR #337](https://github.com/IdiotFrogs/MemorySeal-Android/pull/337)
-- 페이지네이션 공통 로직 구현 및 멤버 화면 적용 — [PR #312](https://github.com/IdiotFrogs/MemorySeal-Android/pull/312)
 
 ## Open Source
 
